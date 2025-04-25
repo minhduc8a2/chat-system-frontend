@@ -5,16 +5,18 @@ import { Listbox, ListboxItem } from "@heroui/react"
 import { useContext } from "react"
 import { ChatContext } from "../context/chatContext"
 import { HiUserGroup } from "react-icons/hi"
+import { AuthContext } from "../../auth/authProvider/AuthContext"
 
 export default function RoomList() {
   const { setActiveRoom } = useContext(ChatContext)
+  const {authInfo} = useContext(AuthContext)
   const {
     data: roomList,
     isLoading,
     error,
   } = useQuery({
     queryKey: [QueryRoomKey.ROOM_LIST],
-    queryFn: ChatRoomAPI.getChatRoomList,
+    queryFn: ()=> ChatRoomAPI.getChatRoomList(authInfo!.userId),
   })
   if (isLoading) return <p>Loading...</p>
   if (error) return <p>Error loading rooms: {error.message}</p>

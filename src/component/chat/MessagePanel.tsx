@@ -9,8 +9,10 @@ import {
 import { ChatContext, ChatContextType } from "./context/chatContext"
 import { MessageDTO } from "../../model/domain/MessageDTO"
 import { Card, CardBody } from "@heroui/react"
+import { AuthContext } from "../auth/authProvider/AuthContext"
 
 export default function MessagePanel() {
+  const { authInfo } = useContext(AuthContext)
   const { wsClient, isConnected } =
     useContext<WebsocketContextType>(WebsocketContext)
   const { activeRoom } = useContext<ChatContextType>(ChatContext)
@@ -46,7 +48,7 @@ export default function MessagePanel() {
   const virtualItems = virtualizer.getVirtualItems()
 
   return (
-    <div className="h-96 overflow-y-auto" ref={parentRef}>
+    <div className="h-96 overflow-y-auto overflow-x-hidden" ref={parentRef}>
       <ul
         style={{
           height: `${virtualizer.getTotalSize()}px`,
@@ -70,7 +72,9 @@ export default function MessagePanel() {
                 transform: `translateY(${virtualItem.start}px)`,
               }}
               data-index={virtualItem.index}
-              className="px-4 py-2 m-2 rounded-lg shadow whitespace-pre-wrap break-words max-w-[500px]"
+              className={`px-4 py-2 m-2  whitespace-pre-wrap break-words  flex ${
+                msg.senderId === authInfo?.userId ? "justify-end " : "justify-start"
+              }`}
             >
               <Card>
                 <CardBody>{msg.content}</CardBody>

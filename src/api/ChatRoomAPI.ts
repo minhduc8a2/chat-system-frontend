@@ -7,7 +7,7 @@ import { API_GATEWAY_URL } from "./apiEndpoints"
 export const CHAT_SERVICE_URL = `${API_GATEWAY_URL}/api/v1/chat`
 export const CHAT_ROOM_ENDPOINTS = {
   createRoom: `${CHAT_SERVICE_URL}/chat-rooms`,
-  getRooms: `${CHAT_SERVICE_URL}/chat-rooms?sortBy=name,id&sortDir=desc,asc`,
+  getRooms: `${CHAT_SERVICE_URL}/chat-rooms`,
 }
 
 export class ChatRoomAPI {
@@ -15,8 +15,10 @@ export class ChatRoomAPI {
     return api.post(CHAT_ROOM_ENDPOINTS.createRoom, { name, type })
   }
 
-  static async getChatRoomList(): Promise<Room[]> {
-    const response = await api.get(CHAT_ROOM_ENDPOINTS.getRooms)
+  static async getChatRoomList(userId: number): Promise<Room[]> {
+    const response = await api.get(
+      CHAT_ROOM_ENDPOINTS.getRooms + `/users/${userId}`
+    )
     return response.data.content.map((roomData: any) => Room.fromJSON(roomData))
   }
 }

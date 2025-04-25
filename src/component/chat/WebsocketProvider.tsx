@@ -8,7 +8,7 @@ import {
 } from "react"
 import { Client } from "@stomp/stompjs"
 import { CHAT_ENDPOINTS } from "../../api/apiEndpoints"
-import { AuthContext } from "../AuthProvider"
+import { AuthContext } from "../auth/authProvider/AuthContext"
 import {
   WebsocketContext,
   WebsocketContextType,
@@ -40,7 +40,7 @@ export default function WebsocketProvider({
           client.subscribe("/user/queue/errors", (message) => {
             const error = JSON.parse(message.body)
             console.error("🚨 Error from server:", error)
-          
+
             // You can also show a toast notification or alert here
             alert(`Server Error: ${error.message || "Unknown error"}`)
           })
