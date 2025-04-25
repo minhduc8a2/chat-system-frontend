@@ -1,4 +1,4 @@
-import CreateRoom from "./CreateRoom"
+import Options from "./Options"
 import RoomList from "./RoomList"
 
 export default function RoomManager() {
@@ -6,7 +6,7 @@ export default function RoomManager() {
     <div className=" border-r-2 border-r-white/15 px-6">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl my-4">Rooms</h2>
-        <CreateRoom />
+        <Options />
       </div>
       <RoomList />
     </div>
