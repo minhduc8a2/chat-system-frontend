@@ -10,6 +10,7 @@ import Login from "./component/auth/Login.tsx"
 import PrivateRoute from "./component/auth/PrivateRoute.tsx"
 import Chat from "./component/chat/Chat.tsx"
 import Register from "./component/auth/Register.tsx"
+import DrawerMenu from "./component/DrawerMenu.tsx"
 const queryClient = new QueryClient()
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -17,6 +18,7 @@ createRoot(document.getElementById("root")!).render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AuthProvider>
+            <DrawerMenu />
             <Routes>
               <Route
                 path="/"

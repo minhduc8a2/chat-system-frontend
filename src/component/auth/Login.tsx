@@ -55,7 +55,13 @@ export default function Login() {
             setPassword(value)
           }}
         />
-        <Button type="submit" variant="bordered" className="mt-4">
+        <Button
+          type="submit"
+          variant="bordered"
+          className="mt-4"
+          isLoading={mutation.isPending}
+          isDisabled={mutation.isPending}
+        >
           Submit
         </Button>
 

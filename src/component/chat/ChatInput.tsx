@@ -3,7 +3,7 @@ import { useContext, useState } from "react"
 import { WebsocketContext } from "./context/websocketContext"
 import { CHAT_ENDPOINTS } from "../../api/apiEndpoints"
 import { ChatContext } from "./context/chatContext"
-
+import { IoSend } from "react-icons/io5"
 export default function ChatInput() {
   const [message, setMessage] = useState("")
   const { activeRoom } = useContext(ChatContext)
@@ -47,8 +47,13 @@ export default function ChatInput() {
             if (e.key === "Enter") sendMessage(e)
           }}
         />
-        <Button color="primary" type="submit" isDisabled={!activeRoom}>
-          Send
+        <Button
+          color="primary"
+          isIconOnly
+          type="submit"
+          isDisabled={!activeRoom}
+        >
+          <IoSend />
         </Button>
       </Form>
     </div>

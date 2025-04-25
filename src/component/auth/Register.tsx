@@ -68,7 +68,13 @@ export default function Register() {
             setPassword(value)
           }}
         />
-        <Button type="submit" variant="bordered" className="mt-4">
+        <Button
+          type="submit"
+          variant="bordered"
+          className="mt-4"
+          isLoading={mutation.isPending}
+          isDisabled={mutation.isPending}
+        >
           Submit
         </Button>
         <Link to="/login" className="text-blue-500 underline mt-4">
