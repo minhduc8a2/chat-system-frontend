@@ -1,10 +1,10 @@
 import { HeroUIProvider } from "@heroui/react"
-import  { ReactNode } from "react"
-
-export default function Provider({ children }:{children:ReactNode}) {
+import { ReactNode } from "react"
+import { ThemeProvider } from 'next-themes'
+export default function Provider({ children }: { children: ReactNode }) {
   return (
     <HeroUIProvider>
-      <main className="dark text-foreground bg-background min-h-screen">{children}</main>
+      <ThemeProvider attribute="class" defaultTheme="dark">{children}</ThemeProvider>
     </HeroUIProvider>
   )
 }

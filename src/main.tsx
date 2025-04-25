@@ -9,6 +9,7 @@ import AuthProvider from "./component/AuthProvider.tsx"
 import Login from "./component/Login.tsx"
 import PrivateRoute from "./component/PrivateRoute.tsx"
 import Chat from "./component/chat/Chat.tsx"
+import Register from "./component/Register.tsx"
 const queryClient = new QueryClient()
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -34,6 +35,7 @@ createRoot(document.getElementById("root")!).render(
                 }
               />
               <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
             </Routes>
           </AuthProvider>
         </BrowserRouter>
