@@ -75,7 +75,12 @@ export default function CreateRoom({
             >
               {(roomType) => <SelectItem>{roomType.label}</SelectItem>}
             </Select>
-            <Button type="submit" color="primary">
+            <Button
+              type="submit"
+              color="primary"
+              isLoading={mutation.isPending}
+              isDisabled={mutation.isPending}
+            >
               Create room
             </Button>
           </Form>

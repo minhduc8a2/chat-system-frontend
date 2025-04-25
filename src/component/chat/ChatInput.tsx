@@ -36,9 +36,10 @@ export default function ChatInput() {
   }
 
   return (
-    <div className="flex justify-center items-center">
-      <Form onSubmit={sendMessage}>
+    <div className="mt-8">
+      <Form onSubmit={sendMessage} className="flex flex-row">
         <Input
+          isDisabled={!activeRoom}
           type="text"
           value={message}
           onValueChange={(value) => setMessage(value)}
@@ -46,7 +47,7 @@ export default function ChatInput() {
             if (e.key === "Enter") sendMessage(e)
           }}
         />
-        <Button color="primary" type="submit">
+        <Button color="primary" type="submit" isDisabled={!activeRoom}>
           Send
         </Button>
       </Form>

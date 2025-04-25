@@ -61,7 +61,12 @@ export default function JoinRoom({
               placeholder="Example: 1"
               onValueChange={(value) => (roomIdRef.current = value)}
             />
-            <Button type="submit" color="primary">
+            <Button
+              type="submit"
+              color="primary"
+              isLoading={mutation.isPending}
+              isDisabled={mutation.isPending}
+            >
               Join room
             </Button>
           </Form>
