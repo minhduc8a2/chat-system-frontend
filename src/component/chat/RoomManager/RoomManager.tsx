@@ -1,4 +1,5 @@
 import CreateRoom from "./CreateRoom"
+import RoomList from "./RoomList"
 
 export default function RoomManager() {
   return (
@@ -7,6 +8,7 @@ export default function RoomManager() {
         <h2 className="text-3xl my-4">Rooms</h2>
         <CreateRoom />
       </div>
+      <RoomList />
     </div>
   )
 }

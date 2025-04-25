@@ -1,4 +1,6 @@
-import { RoomType } from "../enum/RoomType"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Room } from "../model/domain/Room"
+import { RoomType } from "../model/enum/RoomType"
 import api from "../util/requester"
 import { API_GATEWAY_URL } from "./apiEndpoints"
 
@@ -11,5 +13,9 @@ export const CHAT_ROOM_ENDPOINTS = {
 export class ChatRoomAPI {
   static async createChatRoom(name: string, type: RoomType) {
     return api.post(CHAT_ROOM_ENDPOINTS.createRoom, { name, type })
+  }
+  static async getChatRoomList(): Promise<Room[]> {
+    const response = await api.get(CHAT_ROOM_ENDPOINTS.getRooms)
+    return response.data.content.map((roomData: any) => Room.fromJSON(roomData))
   }
 }

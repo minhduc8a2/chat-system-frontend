@@ -11,7 +11,7 @@ import {
 } from "@heroui/react"
 import { useMutation } from "@tanstack/react-query"
 import { ChatRoomAPI } from "../../../api/ChatRoomAPI"
-import { RoomType } from "../../../enum/RoomType"
+import { RoomType } from "../../../model/enum/RoomType"
 
 const roomTypes = Object.values(RoomType).map((key) => ({
   key,
