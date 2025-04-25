@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useCallback, useMemo, useState } from "react"
+import { TokenStore } from "../store/tokenStore"
 
 export interface AuthContextType {
   accessToken: string | null
@@ -33,8 +34,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       accessToken: string
       refreshToken: string
     }) => {
-      localStorage.setItem("accessToken", accessToken)
-      localStorage.setItem("refreshToken", refreshToken)
+      TokenStore.storeTokens(accessToken,refreshToken)
       setAccessToken(accessToken)
       setRefreshToken(refreshToken)
       setIsAuthenticated(true)
@@ -43,8 +43,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   )
 
   const logout = useCallback(() => {
-    localStorage.removeItem("accessToken")
-    localStorage.removeItem("refreshToken")
+    TokenStore.removeTokens()
     setAccessToken(null)
     setRefreshToken(null)
     setIsAuthenticated(false)
