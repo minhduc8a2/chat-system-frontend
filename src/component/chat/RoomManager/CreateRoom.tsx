@@ -13,6 +13,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ChatRoomAPI } from "../../../api/ChatRoomAPI"
 import { RoomType } from "../../../model/enum/RoomType"
 import { QueryRoomKey } from "../../../model/enum/QueryRoomKey"
+import { useHttpErrorHandler } from "../../../util/HttpErrorHandler"
 
 const roomTypes = Object.values(RoomType).map((key) => ({
   key,
@@ -28,6 +29,7 @@ export default function CreateRoom({
   const roomNameRef = useRef<string>("Room 1")
   const roomTypeRef = useRef<RoomType>(roomTypes[0].key)
   const queryClient = useQueryClient()
+  const { handle } = useHttpErrorHandler()
   const mutation = useMutation({
     mutationFn: () => {
       if (roomNameRef.current.length == 0) throw Error("Room name is required")
@@ -41,7 +43,7 @@ export default function CreateRoom({
       setIsOpen(false)
     },
     onError: (e: Error) => {
-      alert("Error: " + e.message)
+      handle(e)
     },
   })
   const handleSubmit = (e: FormEvent) => {

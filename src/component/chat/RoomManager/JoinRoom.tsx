@@ -10,7 +10,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ChatRoomAPI } from "../../../api/ChatRoomAPI"
 import { QueryRoomKey } from "../../../model/enum/QueryRoomKey"
-import axios from "axios"
+import { useHttpErrorHandler } from "../../../util/HttpErrorHandler"
 
 export default function JoinRoom({
   isOpen,
@@ -21,6 +21,7 @@ export default function JoinRoom({
 }) {
   const roomIdRef = useRef<string>("Room 1")
   const queryClient = useQueryClient()
+  const { handle } = useHttpErrorHandler()
   const mutation = useMutation({
     mutationFn: () => {
       if (roomIdRef.current.length == 0) throw Error("Room ID is required")
@@ -38,18 +39,10 @@ export default function JoinRoom({
       setIsOpen(false)
     },
     onError: (e: Error) => {
-      if (axios.isAxiosError(e)) {
-        switch (e.response?.status) {
-          case 404:
-            alert("Room ID is not exists")
-            break
-          case 400:
-            alert("You've already joined")
-            break
-          default:
-            break
-        }
-      }
+      handle(e, {
+        404: "Room ID does not exist.",
+        400: "You have already joined this room.",
+      })
     },
   })
   const handleSubmit = (e: FormEvent) => {
