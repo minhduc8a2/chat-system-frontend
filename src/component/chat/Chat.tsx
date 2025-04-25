@@ -4,13 +4,14 @@ import RoomManager from "./RoomManager/RoomManager"
 import { ChatContext, ChatContextType } from "./context/chatContext"
 import ChatInput from "./ChatInput"
 import MessagePanel from "./MessagePanel"
+import { Room } from "../../model/domain/Room"
 
 export default function Chat() {
-  const [activeRoomId, setActiveRoomId] = useState<number | null>(1)
+  const [activeRoom, setActiveRoom] = useState<Room | null>(null)
 
   const chatContextValue = useMemo<ChatContextType>(
-    () => ({ activeRoomId, setActiveRoomId }),
-    [activeRoomId]
+    () => ({ activeRoom, setActiveRoom }),
+    [activeRoom]
   )
   return (
     <WebsocketProvider>
@@ -19,7 +20,17 @@ export default function Chat() {
           <div className="col-span-1">
             <RoomManager />
           </div>
-          <div className="col-span-5">
+          <div className="col-span-5 px-6">
+            {!activeRoom ? (
+              <h1 className="mb-8">Choose your chat room!</h1>
+            ) : (
+              <h1 className="mb-8">
+                Active Room:{" "}
+                <span className="dark:text-blue-400 text-blue-500">
+                  {activeRoom?.name}
+                </span>
+              </h1>
+            )}
             <MessagePanel />
             <ChatInput />
           </div>

@@ -1,10 +1,11 @@
 import { createContext } from "react"
+import { Room } from "../../../model/domain/Room"
 
 export interface ChatContextType {
-  activeRoomId: number | null
-  setActiveRoomId:React.Dispatch<React.SetStateAction<number | null>>
+  activeRoom: Room | null
+  setActiveRoom:React.Dispatch<React.SetStateAction<Room | null>>
 }
 export const ChatContext = createContext<ChatContextType>({
-  activeRoomId: null,
-  setActiveRoomId:()=>{}
+  activeRoom: null,
+  setActiveRoom:()=>{}
 })

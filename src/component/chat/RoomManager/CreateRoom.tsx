@@ -9,9 +9,11 @@ import {
   Select,
   SelectItem,
 } from "@heroui/react"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ChatRoomAPI } from "../../../api/ChatRoomAPI"
 import { RoomType } from "../../../model/enum/RoomType"
+import { QueryRoomKey } from "../../../model/enum/QueryRoomKey"
+import { LuCirclePlus } from "react-icons/lu"
 
 const roomTypes = Object.values(RoomType).map((key) => ({
   key,
@@ -21,7 +23,7 @@ export default function CreateRoom() {
   const [isOpen, setIsOpen] = useState(false)
   const roomNameRef = useRef<string>("Room 1")
   const roomTypeRef = useRef<RoomType>(roomTypes[0].key)
-
+  const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: () => {
       if (roomNameRef.current.length == 0) throw Error("Room name is required")
@@ -29,6 +31,10 @@ export default function CreateRoom() {
         roomNameRef.current,
         roomTypeRef.current
       )
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QueryRoomKey.ROOM_LIST] })
+      setIsOpen(false)
     },
     onError: (e: Error) => {
       alert("Error: " + e.message)
@@ -40,7 +46,9 @@ export default function CreateRoom() {
   }
   return (
     <>
-      <Button onPress={() => setIsOpen(true)}>Create room</Button>
+      <Button onPress={() => setIsOpen(true)} isIconOnly>
+        <LuCirclePlus className="text-xl"/>
+      </Button>
       <Modal isOpen={isOpen} onOpenChange={() => setIsOpen(false)}>
         <ModalContent>
           <ModalBody>

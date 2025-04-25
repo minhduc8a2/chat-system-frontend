@@ -6,7 +6,7 @@ import { ChatContext } from "./context/chatContext"
 
 export default function ChatInput() {
   const [message, setMessage] = useState("")
-  const { activeRoomId } = useContext(ChatContext)
+  const { activeRoom } = useContext(ChatContext)
   const { wsClient, isConnected } = useContext(WebsocketContext)
 
   const sendMessage = (event?: React.FormEvent | React.MouseEvent) => {
@@ -17,7 +17,7 @@ export default function ChatInput() {
       return
     }
 
-    if (!activeRoomId) {
+    if (!activeRoom) {
       alert("No active room selected.")
       return
     }
@@ -28,7 +28,7 @@ export default function ChatInput() {
     }
 
     wsClient.publish({
-      destination: CHAT_ENDPOINTS.sendToChatRoom + `/${activeRoomId}`,
+      destination: CHAT_ENDPOINTS.sendToChatRoom + `/${activeRoom.id}`,
       body: JSON.stringify({ content: message }),
     })
 

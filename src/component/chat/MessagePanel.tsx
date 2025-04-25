@@ -6,44 +6,31 @@ import {
   WebsocketContextType,
 } from "./context/websocketContext"
 import { ChatContext, ChatContextType } from "./context/chatContext"
-
-export interface MessageType {
-  id: number
-  content: string
-  createdAt: string
-}
+import { MessageDTO } from "../../model/domain/MessageDTO"
 
 export default function MessagePanel() {
   const { wsClient, isConnected } =
     useContext<WebsocketContextType>(WebsocketContext)
-  const { activeRoomId } = useContext<ChatContextType>(ChatContext)
-  const [messageList, setMessageList] = useState<MessageType[]>([])
+  const { activeRoom } = useContext<ChatContextType>(ChatContext)
+  const [messageList, setMessageList] = useState<MessageDTO[]>([])
   useEffect(() => {
-    if (!wsClient || !isConnected || !activeRoomId) return
+    if (!wsClient || !isConnected || !activeRoom) return
 
     const subscription = wsClient.subscribe(
-      CHAT_ENDPOINTS.receiveFromChatRoom + `/${activeRoomId}`,
+      CHAT_ENDPOINTS.receiveFromChatRoom + `/${activeRoom.id}`,
       (message) => {
         const parsedMessage = JSON.parse(message.body)
-        setMessageList((prev) => [
-          ...prev,
-          {
-            id: parsedMessage.id,
-            content: parsedMessage.content,
-            createdAt: parsedMessage.createdAt,
-          },
-        ])
+        setMessageList((prev) => [...prev, MessageDTO.fromJSON(parsedMessage)])
       }
     )
 
     return () => {
       subscription.unsubscribe()
     }
-  }, [wsClient, activeRoomId, isConnected])
+  }, [wsClient, activeRoom, isConnected])
   return (
     <div>
-      <h2>Messages</h2>
-      <ul>
+      <ul >
         {messageList.map((msg) => (
           <li key={msg.id} className="my-2 text-lg">
             {msg.content}
