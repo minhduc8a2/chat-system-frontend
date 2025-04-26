@@ -13,6 +13,7 @@ import { MdLogout } from "react-icons/md"
 import { AuthContext } from "../auth/authProvider/AuthContext"
 import UserCard from "./UserCard"
 import { DrawerMenuContext, DrawerMenuContextType } from "./DrawerMenuContext"
+import LinkList from "./LinkList"
 export default function DrawerMenu() {
   const { logout, isAuthenticated } = useContext(AuthContext)
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
@@ -35,6 +36,9 @@ export default function DrawerMenu() {
           <DrawerHeader className="flex flex-col gap-1"></DrawerHeader>
           <DrawerBody>
             <UserCard />
+            <div className="mt-12">
+              <LinkList />
+            </div>
           </DrawerBody>
           <DrawerFooter>
             <Button isIconOnly onPress={logout}>
