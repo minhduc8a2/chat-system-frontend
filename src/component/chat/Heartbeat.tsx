@@ -4,22 +4,53 @@ import { CHAT_ENDPOINTS } from "../../api/apiEndpoints"
 
 export default function Heartbeat() {
   const { wsClient, isConnected } = useWebsocketContext()
-  const scheduledTask = useRef<number>(null)
+
+  const heartbeatInterval = useRef<number>(null)
+  const healthCheckInterval = useRef<number>(null)
+  const serverAliveRef = useRef<boolean>(true)
+
   useEffect(() => {
     if (wsClient && isConnected) {
-      scheduledTask.current = setInterval(() => {
-        wsClient.publish({
-          destination: CHAT_ENDPOINTS.heartbeat,
-          body: "",
-        })
-      }, 3000)
+      console.log("⏰ Starting heartbeat and healthcheck")
+
+      heartbeatInterval.current = setInterval(() => {
+        if (wsClient.connected) {
+          wsClient.publish({
+            destination: CHAT_ENDPOINTS.heartbeat,
+            body: "",
+          })
+          console.log("📡 Heartbeat sent")
+        }
+      }, 5000)
+
+      healthCheckInterval.current = setInterval(() => {
+        if (!serverAliveRef.current) {
+          console.error(
+            "🛑 Server not responding to heartbeats. Reconnecting..."
+          )
+
+          wsClient.deactivate()
+          wsClient.activate()
+        }
+        serverAliveRef.current = false
+      }, 10000)
+
+      wsClient.subscribe(CHAT_ENDPOINTS.heartbeatReply, () => {
+        console.log("💓 Heartbeat reply received")
+        serverAliveRef.current = true
+      })
     }
+
     return () => {
-      if (scheduledTask.current) {
-        clearInterval(scheduledTask.current)
-      }
-      scheduledTask.current = null
+      console.log("🛑 Cleaning up heartbeat and healthcheck")
+      if (heartbeatInterval.current) clearInterval(heartbeatInterval.current)
+      if (healthCheckInterval.current)
+        clearInterval(healthCheckInterval.current)
+      heartbeatInterval.current = null
+      healthCheckInterval.current = null
+      serverAliveRef.current = true
     }
   }, [wsClient, isConnected])
-  return <></>
+
+  return null
 }
