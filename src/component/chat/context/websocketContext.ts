@@ -1,5 +1,5 @@
 import { Client } from "@stomp/stompjs"
-import { createContext } from "react"
+import { createContext, useContext } from "react"
 
 export type WebsocketContextType = {
   wsClient: Client | null
@@ -10,3 +10,9 @@ export const WebsocketContext = createContext<WebsocketContextType>({
   wsClient: null,
   isConnected: false,
 })
+
+export const useWebsocketContext = ()=>{
+  const context = useContext(WebsocketContext)
+
+  return context
+}

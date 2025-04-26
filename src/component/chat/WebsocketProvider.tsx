@@ -8,6 +8,7 @@ import {
 import AuthAPI from "../../api/AuthAPI"
 import { TokenStore } from "../../store/tokenStore"
 import { useAccessToken } from "../../hook/useAccessToken"
+import Heartbeat from "./Heartbeat"
 
 export default function WebsocketProvider({
   children,
@@ -89,6 +90,7 @@ export default function WebsocketProvider({
 
   return (
     <WebsocketContext.Provider value={websocketContextValue}>
+      <Heartbeat />
       {children}
     </WebsocketContext.Provider>
   )
