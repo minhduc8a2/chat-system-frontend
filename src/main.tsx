@@ -10,7 +10,8 @@ import Login from "./component/auth/Login.tsx"
 import PrivateRoute from "./component/auth/PrivateRoute.tsx"
 import Chat from "./component/chat/Chat.tsx"
 import Register from "./component/auth/Register.tsx"
-import DrawerMenu from "./component/DrawerMenu.tsx"
+import DrawerMenu from "./component/drawerMenu/DrawerMenu.tsx"
+import { AppRoute } from "./model/enum/AppRoutes.ts"
 const queryClient = new QueryClient()
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -21,7 +22,7 @@ createRoot(document.getElementById("root")!).render(
             <DrawerMenu />
             <Routes>
               <Route
-                path="/"
+                path={AppRoute.HOME}
                 element={
                   <PrivateRoute>
                     <App />
@@ -29,15 +30,15 @@ createRoot(document.getElementById("root")!).render(
                 }
               />
               <Route
-                path="/chat"
+                path={AppRoute.CHAT}
                 element={
                   <PrivateRoute>
                     <Chat />
                   </PrivateRoute>
                 }
               />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              <Route path={AppRoute.LOGIN} element={<Login />} />
+              <Route path={AppRoute.REGISTER} element={<Register />} />
             </Routes>
           </AuthProvider>
         </BrowserRouter>

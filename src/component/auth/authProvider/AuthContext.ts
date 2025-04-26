@@ -1,4 +1,4 @@
-import { createContext } from "react"
+import { createContext, useContext } from "react"
 import { JwtPayload } from "../../../model/interface/JwtPayload"
 
 export interface AuthContextType {
@@ -18,3 +18,8 @@ export const AuthContext = createContext<AuthContextType>({
   login: () => {},
   logout: () => {},
 })
+
+export const useAuthContext = () => {
+  const authContext = useContext(AuthContext)
+  return authContext
+}

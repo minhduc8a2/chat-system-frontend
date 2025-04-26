@@ -1,4 +1,4 @@
-import { useContext } from "react"
+import { useContext, useMemo } from "react"
 import {
   Drawer,
   DrawerContent,
@@ -9,14 +9,20 @@ import {
   useDisclosure,
 } from "@heroui/react"
 import { HiOutlineMenu } from "react-icons/hi"
-import { AuthContext } from "./auth/authProvider/AuthContext"
 import { MdLogout } from "react-icons/md"
+import { AuthContext } from "../auth/authProvider/AuthContext"
+import UserCard from "./UserCard"
+import { DrawerMenuContext, DrawerMenuContextType } from "./DrawerMenuContext"
 export default function DrawerMenu() {
   const { logout, isAuthenticated } = useContext(AuthContext)
-  const { isOpen, onOpen, onOpenChange } = useDisclosure()
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
+  const contextValue = useMemo<DrawerMenuContextType>(
+    () => ({ close: onClose }),
+    [onClose]
+  )
   if (!isAuthenticated) return <></>
   return (
-    <>
+    <DrawerMenuContext.Provider value={contextValue}>
       <Button
         isIconOnly
         onPress={() => onOpen()}
@@ -27,7 +33,9 @@ export default function DrawerMenu() {
       <Drawer isOpen={isOpen} placement="left" onOpenChange={onOpenChange}>
         <DrawerContent>
           <DrawerHeader className="flex flex-col gap-1"></DrawerHeader>
-          <DrawerBody></DrawerBody>
+          <DrawerBody>
+            <UserCard />
+          </DrawerBody>
           <DrawerFooter>
             <Button isIconOnly onPress={logout}>
               <MdLogout />
@@ -35,6 +43,6 @@ export default function DrawerMenu() {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-    </>
+    </DrawerMenuContext.Provider>
   )
 }
