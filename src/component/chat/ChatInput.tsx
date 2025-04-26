@@ -16,19 +16,11 @@ export default function ChatInput() {
       alert("Not connected to the server.")
       return
     }
-
-    if (!activeRoom) {
-      alert("No active room selected.")
+    if (message.length == 0) {
       return
     }
-
-    if (!message.trim()) {
-      alert("Cannot send an empty message.")
-      return
-    }
-
     wsClient.publish({
-      destination: CHAT_ENDPOINTS.sendToChatRoom + `/${activeRoom.id}`,
+      destination: CHAT_ENDPOINTS.sendToChatRoom + `/${activeRoom!.id}`,
       body: JSON.stringify({ content: message }),
     })
 
@@ -41,6 +33,7 @@ export default function ChatInput() {
         <Input
           isDisabled={!activeRoom}
           type="text"
+          isRequired
           value={message}
           onValueChange={(value) => setMessage(value)}
           onKeyDown={(e) => {

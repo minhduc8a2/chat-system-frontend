@@ -1,30 +1,26 @@
-import {
-  ReactNode,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react"
 import { Client } from "@stomp/stompjs"
 import { CHAT_ENDPOINTS } from "../../api/apiEndpoints"
-import { AuthContext } from "../auth/authProvider/AuthContext"
 import {
   WebsocketContext,
   WebsocketContextType,
 } from "./context/websocketContext"
+import AuthAPI from "../../api/AuthAPI"
+import { TokenStore } from "../../store/tokenStore"
+import { useAccessToken } from "../../hook/useAccessToken"
 
 export default function WebsocketProvider({
   children,
 }: {
   children: ReactNode
 }) {
-  const { accessToken } = useContext(AuthContext)
+  const [accessToken] = useAccessToken()
   const [isConnected, setIsConnected] = useState(false)
   const [wsClient, setWsClient] = useState<Client | null>(null)
   const clientRef = useRef<Client | null>(null)
 
   useEffect(() => {
+    console.log("Rerun")
     if (!accessToken) {
       console.log("⛔ No accessToken, skipping WebSocket setup")
       return
@@ -32,7 +28,12 @@ export default function WebsocketProvider({
 
     if (!clientRef.current) {
       const client = new Client({
-        brokerURL: CHAT_ENDPOINTS.websocket + "?token=" + accessToken,
+        webSocketFactory: () => {
+          const latestToken = TokenStore.getAccessToken() // always read latest
+          return new WebSocket(
+            CHAT_ENDPOINTS.websocket + "?token=" + latestToken
+          )
+        },
         reconnectDelay: 5000,
         onConnect: () => {
           console.log("✅ WebSocket connected")
@@ -52,6 +53,15 @@ export default function WebsocketProvider({
         onStompError: (frame) => {
           console.error("💥 STOMP error", frame)
         },
+        onWebSocketError: () => {
+          AuthAPI.refreshToken()
+            .then((data) => {
+              if (data) {
+                TokenStore.storeTokens(data.accessToken, data.refreshToken)
+              }
+            })
+            .catch(() => TokenStore.removeTokens())
+        },
       })
 
       clientRef.current = client
@@ -64,10 +74,10 @@ export default function WebsocketProvider({
       if (client && client.active) {
         console.log("🛑 Cleaning up WebSocket")
         client.deactivate()
-        clientRef.current = null
         setWsClient(null)
         setIsConnected(false)
       }
+      clientRef.current = null
     }
   }, [accessToken])
 

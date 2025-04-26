@@ -26,7 +26,7 @@ export default function CreateRoom({
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 }) {
-  const roomNameRef = useRef<string>("Room 1")
+  const roomNameRef = useRef<string>("")
   const roomTypeRef = useRef<RoomType>(roomTypes[0].key)
   const queryClient = useQueryClient()
   const { handle } = useHttpErrorHandler()
@@ -48,6 +48,7 @@ export default function CreateRoom({
   })
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
+    
     mutation.mutate()
   }
   return (

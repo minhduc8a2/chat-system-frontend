@@ -5,7 +5,7 @@ import { useErrorModal } from "../component/ErrorModal/ErrorModalContext"
 export function useHttpErrorHandler() {
   const { showError } = useErrorModal()
 
-  const handle = (error: unknown, customMessages?: Record<number, string>) => {
+  const handle = (error: Error, customMessages?: Record<number, string>) => {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status
       const defaultMsg = "An unexpected error occurred."
@@ -17,7 +17,7 @@ export function useHttpErrorHandler() {
 
       showError(msg, `Error ${status ?? ""}`)
     } else {
-      showError("An unknown error occurred.", "Unexpected Error")
+      showError(error.message, "Unexpected Error")
     }
   }
 
