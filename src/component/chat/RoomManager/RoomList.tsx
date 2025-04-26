@@ -1,23 +1,27 @@
 import { useQuery } from "@tanstack/react-query"
 import { QueryRoomKey } from "../../../model/enum/QueryRoomKey"
 import { ChatRoomAPI } from "../../../api/ChatRoomAPI"
-import { Listbox, ListboxItem } from "@heroui/react"
-import { useContext } from "react"
+import { Listbox, ListboxItem, Selection } from "@heroui/react"
+import { useContext, useState } from "react"
 import { ChatContext } from "../context/chatContext"
 import { HiUserGroup } from "react-icons/hi"
 import { AuthContext } from "../../auth/authProvider/AuthContext"
 
 export default function RoomList() {
-  const { setActiveRoom } = useContext(ChatContext)
-  const {authInfo} = useContext(AuthContext)
+  const { setActiveRoom} = useContext(ChatContext)
+
+  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]))
+
+  const { authInfo } = useContext(AuthContext)
   const {
     data: roomList,
     isLoading,
     error,
   } = useQuery({
     queryKey: [QueryRoomKey.ROOM_LIST],
-    queryFn: ()=> ChatRoomAPI.getChatRoomList(authInfo!.userId),
+    queryFn: () => ChatRoomAPI.getChatRoomList(authInfo!.userId),
   })
+
   if (isLoading) return <p>Loading...</p>
   if (error) return <p>Error loading rooms: {error.message}</p>
   return (
@@ -25,11 +29,14 @@ export default function RoomList() {
       <Listbox
         aria-label="Room list"
         items={roomList}
-        onAction={(key) => {
-          const id = parseInt(key.toString())
+        selectedKeys={selectedKeys}
+        onSelectionChange={(keys) => {
+          setSelectedKeys(keys)
+          const id = parseInt(Array.from(keys)[0].toString())
           setActiveRoom(roomList!.find((r) => r.id == id)!)
-          console.log("active room id: " + key.toString())
+          console.log("active room id: " + id)
         }}
+        selectionMode="single"
         isVirtualized
         virtualization={{
           maxListboxHeight: 400,

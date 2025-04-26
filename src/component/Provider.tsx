@@ -1,7 +1,7 @@
 import { HeroUIProvider } from "@heroui/react"
 import { ReactNode } from "react"
 import { ThemeProvider } from "next-themes"
-import ErrorModalProvider from "./ErrorModal/ErrorModalProvider"
+import ErrorModalProvider from "./SimpleModal/SimpleModalProvider"
 import { useHref, useNavigate } from "react-router"
 import type {NavigateOptions} from "react-router-dom";
 declare module "@react-types/shared" {

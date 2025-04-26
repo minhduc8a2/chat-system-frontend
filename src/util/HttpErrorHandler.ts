@@ -1,9 +1,9 @@
 // src/utils/HttpErrorHandler.ts
 import axios from "axios"
-import { useErrorModal } from "../component/ErrorModal/ErrorModalContext"
+import { useSimpleModal } from "../component/SimpleModal/SimpleModalContext"
 
 export function useHttpErrorHandler() {
-  const { showError } = useErrorModal()
+  const { showSimpleModal } = useSimpleModal()
 
   const handle = (error: Error, customMessages?: Record<number, string>) => {
     if (axios.isAxiosError(error)) {
@@ -15,9 +15,9 @@ export function useHttpErrorHandler() {
         (status && defaultMessages[status]) ||
         defaultMsg
 
-      showError(msg, `Error ${status ?? ""}`)
+      showSimpleModal(msg, `Error ${status ?? ""}`)
     } else {
-      showError(error.message, "Unexpected Error")
+      showSimpleModal(error.message, "Unexpected Error")
     }
   }
 

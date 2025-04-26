@@ -8,24 +8,24 @@ import {
   useDisclosure,
 } from "@heroui/react"
 import { ReactNode, useState } from "react"
-import { ErrorModalContext } from "./ErrorModalContext"
+import { SimpleModalContext } from "./SimpleModalContext"
 
-export default function ErrorModalProvider({
+export default function SimpleModalProvider({
   children,
 }: {
   children: ReactNode
 }) {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure()
   const [message, setMessage] = useState("")
-  const [title, setTitle] = useState("Error")
+  const [title, setTitle] = useState("Info")
 
-  const showError = (msg: string, customTitle = "Error") => {
+  const showSimpleModal = (msg: string, customTitle = "Info") => {
     setTitle(customTitle)
     setMessage(msg)
     onOpen()
   }
   return (
-    <ErrorModalContext.Provider value={{ showError }}>
+    <SimpleModalContext.Provider value={{ showSimpleModal }}>
       {children}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
         <ModalContent>
@@ -44,7 +44,7 @@ export default function ErrorModalProvider({
           )}
         </ModalContent>
       </Modal>
-    </ErrorModalContext.Provider>
+    </SimpleModalContext.Provider>
   )
 }
 

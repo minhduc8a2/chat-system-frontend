@@ -53,7 +53,8 @@ export default function WebsocketProvider({
         onStompError: (frame) => {
           console.error("💥 STOMP error", frame)
         },
-        onWebSocketError: () => {
+        onWebSocketError: (error) => {
+          console.log(error)
           AuthAPI.refreshToken()
             .then((data) => {
               if (data) {
