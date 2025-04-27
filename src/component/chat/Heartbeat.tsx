@@ -23,18 +23,7 @@ export default function Heartbeat() {
         }
       }, 5000)
 
-      healthCheckInterval.current = setInterval(() => {
-        if (!serverAliveRef.current) {
-          console.error(
-            "🛑 Server not responding to heartbeats. Reconnecting..."
-          )
-
-          wsClient.deactivate()
-          wsClient.activate()
-        }
-        serverAliveRef.current = false
-      }, 10000)
-
+    
       wsClient.subscribe(CHAT_ENDPOINTS.heartbeatReply, () => {
         console.log("💓 Heartbeat reply received")
         serverAliveRef.current = true

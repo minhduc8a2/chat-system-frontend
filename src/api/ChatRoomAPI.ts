@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { BasicUserInfoDTO } from "../model/domain/BasicUserInfoDTO"
 import { Room } from "../model/domain/Room"
 import { RoomType } from "../model/enum/RoomType"
 import api from "../util/requester"
@@ -9,6 +10,7 @@ export const CHAT_ROOM_ENDPOINTS = {
   createRoom: `${CHAT_SERVICE_URL}/chat-rooms`,
   joinRoom: `${CHAT_SERVICE_URL}/chat-rooms/join`,
   getRooms: `${CHAT_SERVICE_URL}/chat-rooms`,
+  getMemberList: `${CHAT_SERVICE_URL}/chat-rooms`,
 }
 
 export class ChatRoomAPI {
@@ -25,5 +27,14 @@ export class ChatRoomAPI {
       CHAT_ROOM_ENDPOINTS.getRooms + `/users/${userId}`
     )
     return response.data.content.map((roomData: any) => Room.fromJSON(roomData))
+  }
+
+  static async getMemberList(chatRoomId: number): Promise<BasicUserInfoDTO[]> {
+    const response = await api.get(
+      CHAT_ROOM_ENDPOINTS.getMemberList + `/${chatRoomId}/members`
+    )
+    return response.data.content.map((member: any) =>
+      BasicUserInfoDTO.fromJson(member)
+    )
   }
 }
