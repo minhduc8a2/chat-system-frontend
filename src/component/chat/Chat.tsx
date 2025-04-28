@@ -6,6 +6,7 @@ import ChatInput from "./ChatInput"
 import MessagePanel from "./MessagePanel"
 import { Room } from "../../model/domain/Room"
 import RoomMemberList from "./roomMemberList/RoomMemberList"
+import CommandHandler from "./CommandHandler"
 
 export default function Chat() {
   const [activeRoom, setActiveRoom] = useState<Room | null>(null)
@@ -17,6 +18,7 @@ export default function Chat() {
   return (
     <WebsocketProvider>
       <ChatContext.Provider value={chatContextValue}>
+        <CommandHandler />
         <div className="grid grid-cols-6 mt-24 px-6 ">
           <div className="col-span-1">
             <RoomManager />
@@ -35,7 +37,9 @@ export default function Chat() {
             <MessagePanel />
             <ChatInput />
           </div>
-          <div className="col-span-1">{activeRoom ? <RoomMemberList /> : ""}</div>
+          <div className="col-span-1 ">
+            {activeRoom ? <RoomMemberList /> : ""}
+          </div>
         </div>
       </ChatContext.Provider>
     </WebsocketProvider>

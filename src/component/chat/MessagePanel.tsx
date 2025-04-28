@@ -19,6 +19,11 @@ export default function MessagePanel() {
   const [messageList, setMessageList] = useState<MessageDTO[]>([])
 
   useEffect(() => {
+    ///init message with fetch
+    setMessageList([]) 
+  }, [activeRoom])
+
+  useEffect(() => {
     if (!wsClient || !isConnected || !activeRoom) return
 
     const subscription = wsClient.subscribe(
@@ -73,7 +78,9 @@ export default function MessagePanel() {
               }}
               data-index={virtualItem.index}
               className={`px-4 py-2 m-2  whitespace-pre-wrap break-words  flex ${
-                msg.senderId === authInfo?.userId ? "justify-end " : "justify-start"
+                msg.senderId === authInfo?.userId
+                  ? "justify-end "
+                  : "justify-start"
               }`}
             >
               <Card>

@@ -5,6 +5,7 @@ export const CHAT_ENDPOINTS = {
   heartbeat: "/app/heartbeat",
   heartbeatReply: "/user/queue/heartbeatReply",
   publicPresence: "/topic/presence",
+  roomCommandBuilder: (roomId: number) => "/topic/chat_room/" + roomId + "/commands",
 }
 
 export const API_GATEWAY_URL = "http://localhost:8083"

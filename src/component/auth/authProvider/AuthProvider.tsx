@@ -1,6 +1,6 @@
 import {  ReactNode, useCallback, useMemo, useState } from "react"
 import { TokenStore } from "../../../store/tokenStore"
-import { JwtPayload } from "../../../model/interface/JwtPayload"
+import { JwtPayload } from "../../../model/domain/JwtPayload"
 import { JwtUtils } from "../../../util/JwtUtils"
 import { AuthContext } from "./AuthContext"
 

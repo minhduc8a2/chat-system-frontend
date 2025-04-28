@@ -6,11 +6,8 @@ import { useDispatch } from "react-redux"
 import { useWebsocketContext } from "../context/websocketContext"
 import { CHAT_ENDPOINTS } from "../../../api/apiEndpoints"
 import { updateMemberStatus } from "../../../store/slice/roomMemberListSlice"
+import { UserPresenceDTO } from "../../../model/domain/UserPresenceDTO"
 
-interface UserPresence {
-  userId: number
-  isOnline: boolean
-}
 export default function RoomMember({ member }: { member: BasicUserInfoDTO }) {
   const dispatch = useDispatch()
   const { wsClient, isConnected } = useWebsocketContext()
@@ -19,11 +16,11 @@ export default function RoomMember({ member }: { member: BasicUserInfoDTO }) {
       wsClient.subscribe(
         CHAT_ENDPOINTS.publicPresence + `/${member.id}`,
         (message) => {
-          const userPresence: UserPresence = JSON.parse(message.body)
+          const userPresence: UserPresenceDTO = JSON.parse(message.body)
           console.log("Receive user status: " + userPresence.isOnline)
           dispatch(
             updateMemberStatus({
-              memberId: userPresence.userId.toString(),
+              memberId: userPresence.id.toString(),
               isOnline: userPresence.isOnline,
             })
           )
@@ -32,7 +29,11 @@ export default function RoomMember({ member }: { member: BasicUserInfoDTO }) {
     }
 
     return () => {
-      wsClient?.unsubscribe(CHAT_ENDPOINTS.publicPresence)
+      try {
+        wsClient?.unsubscribe(CHAT_ENDPOINTS.publicPresence)
+      } catch (error) {
+        console.log(error)
+      }
     }
   }, [wsClient, isConnected, dispatch, member.id])
   return (

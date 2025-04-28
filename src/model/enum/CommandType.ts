@@ -1,0 +1,6 @@
+export enum CommandType {
+  MEMBER_JOIN = "MEMBER_JOIN",
+  MEMBER_LEAVE = "MEMBER_LEAVE",
+  ROOM_UPDATE = "ROOM_UPDATE",
+  ROOM_DELETE = "ROOM_DELETE",
+}

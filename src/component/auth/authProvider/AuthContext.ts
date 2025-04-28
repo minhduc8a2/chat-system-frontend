@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react"
-import { JwtPayload } from "../../../model/interface/JwtPayload"
+import { JwtPayload } from "../../../model/domain/JwtPayload"
 
 export interface AuthContextType {
   authInfo: JwtPayload | null
