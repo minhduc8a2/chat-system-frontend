@@ -22,10 +22,8 @@ export class ChatRoomAPI {
     return api.post(CHAT_ROOM_ENDPOINTS.joinRoom + `/${id}`)
   }
 
-  static async getChatRoomList(userId: number): Promise<Room[]> {
-    const response = await api.get(
-      CHAT_ROOM_ENDPOINTS.getRooms + `/users/${userId}`
-    )
+  static async getChatRoomList(): Promise<Room[]> {
+    const response = await api.get(CHAT_ROOM_ENDPOINTS.getRooms + `/user`)
     return response.data.content.map((roomData: any) => Room.fromJSON(roomData))
   }
 
@@ -33,8 +31,10 @@ export class ChatRoomAPI {
     const response = await api.get(
       CHAT_ROOM_ENDPOINTS.getMemberList + `/${chatRoomId}/members`
     )
-    return response.data.content.map((member: any) =>
-      BasicUserInfoDTO.fromJson(member)
-    )
+    return response.data.content.map((member: any) => ({
+      id: member.id,
+      username: member.username,
+      isOnline: member.isOnline,
+    }))
   }
 }

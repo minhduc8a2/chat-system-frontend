@@ -5,21 +5,19 @@ import { Listbox, ListboxItem, Selection } from "@heroui/react"
 import { useContext, useState } from "react"
 import { ChatContext } from "../context/chatContext"
 import { HiUserGroup } from "react-icons/hi"
-import { AuthContext } from "../../auth/authProvider/AuthContext"
 
 export default function RoomList() {
-  const { setActiveRoom} = useContext(ChatContext)
+  const { setActiveRoom } = useContext(ChatContext)
 
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]))
 
-  const { authInfo } = useContext(AuthContext)
   const {
     data: roomList,
     isLoading,
     error,
   } = useQuery({
     queryKey: [QueryRoomKey.ROOM_LIST],
-    queryFn: () => ChatRoomAPI.getChatRoomList(authInfo!.userId),
+    queryFn: ChatRoomAPI.getChatRoomList,
   })
 
   if (isLoading) return <p>Loading...</p>
