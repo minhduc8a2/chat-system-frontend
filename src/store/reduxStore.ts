@@ -1,9 +1,20 @@
 import { configureStore } from "@reduxjs/toolkit"
 import roomMemberListReducer from "./slice/roomMemberListSlice"
-export const store =  configureStore({
+import authReducer from "./slice/authSlice"
+import { TokenStore } from "./tokenStore"
+import { JwtUtils } from "../util/JwtUtils"
+const preloadedState = {
+  auth: {
+    isAuthenticated: !!TokenStore.getAccessToken(),
+    authInfo: JwtUtils.extractUserFromToken(TokenStore.getAccessToken()),
+  },
+}
+export const store = configureStore({
   reducer: {
     roomMemberList: roomMemberListReducer,
+    auth: authReducer,
   },
+  preloadedState,
 })
 
 // Infer the `RootState`,  `AppDispatch`, and `AppStore` types from the store itself

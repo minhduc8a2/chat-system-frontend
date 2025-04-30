@@ -1,4 +1,4 @@
-import { useContext, useMemo } from "react"
+import {  useMemo } from "react"
 import {
   Drawer,
   DrawerContent,
@@ -10,12 +10,13 @@ import {
 } from "@heroui/react"
 import { HiOutlineMenu } from "react-icons/hi"
 import { MdLogout } from "react-icons/md"
-import { AuthContext } from "../auth/authProvider/AuthContext"
+
 import UserCard from "./UserCard"
 import { DrawerMenuContext, DrawerMenuContextType } from "./DrawerMenuContext"
 import LinkList from "./LinkList"
+import { useAuth } from "../../hook/useAuth"
 export default function DrawerMenu() {
-  const { logout, isAuthenticated } = useContext(AuthContext)
+  const { logout, isAuthenticated } = useAuth()
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
   const contextValue = useMemo<DrawerMenuContextType>(
     () => ({ close: onClose }),

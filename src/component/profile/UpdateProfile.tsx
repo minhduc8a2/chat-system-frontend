@@ -13,13 +13,14 @@ import {
   UserProfileEditable,
 } from "../../model/domain/UserProfile"
 import { UserAPI } from "../../api/UserAPI"
-import { useAuthContext } from "../auth/authProvider/AuthContext"
+
 import { useSimpleModal } from "../SimpleModal/SimpleModalContext"
 import { QueryUserKey } from "../../model/enum/QueryUserKey"
 import { FaEdit } from "react-icons/fa"
+import { useAuth } from "../../hook/useAuth"
 export default function UpdateProfile({ userData }: { userData: UserProfile }) {
   const [isOpen, setIsOpen] = useState(false)
-  const { authInfo } = useAuthContext()
+  const { authInfo } = useAuth()
   const [formData, setFormData] = useState<UserProfileEditable>(() => {
     return userData.editableObject() // converts class instance to plain object
   })

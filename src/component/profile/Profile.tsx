@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query"
-import { useAuthContext } from "../auth/authProvider/AuthContext"
 import { UserAPI } from "../../api/UserAPI"
 import { Avatar, Card, CardBody, CardHeader, Divider } from "@heroui/react"
 import { FaUser } from "react-icons/fa6"
 import UpdateProfile from "./UpdateProfile"
 import { QueryUserKey } from "../../model/enum/QueryUserKey"
+import { useAuth } from "../../hook/useAuth"
 
 export default function Profile() {
-  const { authInfo } = useAuthContext()
+  const { authInfo } = useAuth()
   const {
     data: userData,
     isLoading,
@@ -34,7 +34,8 @@ export default function Profile() {
             return (
               <div className="" key={key}>
                 <p>
-                  <span className="capitalize font-semibold">{key}</span> : {value}
+                  <span className="capitalize font-semibold">{key}</span> :{" "}
+                  {value}
                 </p>
               </div>
             )

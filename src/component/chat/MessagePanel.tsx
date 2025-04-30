@@ -9,10 +9,10 @@ import {
 import { ChatContext, ChatContextType } from "./context/chatContext"
 import { MessageDTO } from "../../model/domain/MessageDTO"
 import { Card, CardBody } from "@heroui/react"
-import { AuthContext } from "../auth/authProvider/AuthContext"
+import { useAuth } from "../../hook/useAuth"
 
 export default function MessagePanel() {
-  const { authInfo } = useContext(AuthContext)
+  const { authInfo } = useAuth()
   const { wsClient, isConnected } =
     useContext<WebsocketContextType>(WebsocketContext)
   const { activeRoom } = useContext<ChatContextType>(ChatContext)

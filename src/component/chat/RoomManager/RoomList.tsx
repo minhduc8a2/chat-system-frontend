@@ -5,10 +5,12 @@ import { Listbox, ListboxItem, Selection } from "@heroui/react"
 import { useContext, useState } from "react"
 import { ChatContext } from "../context/chatContext"
 import { HiUserGroup } from "react-icons/hi"
+import { useNavigate } from "@tanstack/react-router"
+import { AppRoute } from "../../../model/enum/AppRoutes"
 
 export default function RoomList() {
   const { setActiveRoom } = useContext(ChatContext)
-
+  const navigate = useNavigate()
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]))
 
   const {
@@ -33,6 +35,7 @@ export default function RoomList() {
           const id = parseInt(Array.from(keys)[0].toString())
           setActiveRoom(roomList!.find((r) => r.id == id)!)
           console.log("active room id: " + id)
+          navigate({ to: AppRoute.CHAT + `/${id}` })
         }}
         selectionMode="single"
         isVirtualized

@@ -1,12 +1,15 @@
-import { FormEvent, useContext, useState } from "react"
+import { FormEvent, useState } from "react"
 import { Form, Input, Button } from "@heroui/react"
-import { Link, useNavigate } from "react-router"
+
 import { useMutation } from "@tanstack/react-query"
 import AuthAPI from "../../api/AuthAPI"
-import { AuthContext, AuthContextType } from "./authProvider/AuthContext"
+
+import { Link, useNavigate } from "@tanstack/react-router"
+import { AppRoute } from "../../model/enum/AppRoutes"
+import { useAuth } from "../../hook/useAuth"
 
 export default function Login() {
-  const { login } = useContext<AuthContextType>(AuthContext)
+  const { login } = useAuth()
   const navigate = useNavigate()
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
@@ -15,7 +18,7 @@ export default function Login() {
     mutationFn: () => AuthAPI.login(username, password),
     onSuccess: (data) => {
       login(data)
-      navigate("/chat")
+      navigate({ to: AppRoute.CHAT.toString() })
     },
     onError: (error) => {
       alert("Login failed: " + error.message)
@@ -65,7 +68,10 @@ export default function Login() {
           Submit
         </Button>
 
-        <Link to="/register" className="text-blue-500 underline mt-4">
+        <Link
+          to={AppRoute.REGISTER.toString()}
+          className="text-blue-500 underline mt-4"
+        >
           Not have an account?
         </Link>
       </Form>
