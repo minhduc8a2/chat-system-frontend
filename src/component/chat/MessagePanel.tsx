@@ -1,27 +1,31 @@
-import { useContext, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useVirtualizer } from "@tanstack/react-virtual"
 
 import { CHAT_ENDPOINTS } from "../../api/apiEndpoints"
-import {
-  WebsocketContext,
-  WebsocketContextType,
-} from "./context/websocketContext"
-import { ChatContext, ChatContextType } from "./context/chatContext"
+import { useWebsocketContext } from "./context/websocketContext"
+import { useChatRoomContext } from "./context/chatContext"
 import { MessageDTO } from "../../model/domain/MessageDTO"
 import { Card, CardBody } from "@heroui/react"
 import { useAuth } from "../../hook/useAuth"
+import { MessageAPI } from "../../api/MessageAPI"
+import { useQuery } from "@tanstack/react-query"
 
 export default function MessagePanel() {
   const { authInfo } = useAuth()
-  const { wsClient, isConnected } =
-    useContext<WebsocketContextType>(WebsocketContext)
-  const { activeRoom } = useContext<ChatContextType>(ChatContext)
+  const { wsClient, isConnected } = useWebsocketContext()
+  const { activeRoom } = useChatRoomContext()
   const [messageList, setMessageList] = useState<MessageDTO[]>([])
 
+  const { data } = useQuery({
+    queryFn: () => MessageAPI.getMessagesByLastSeen(activeRoom!.id),
+    queryKey: [],
+  })
+
   useEffect(() => {
-    ///init message with fetch
-    setMessageList([]) 
-  }, [activeRoom])
+    if (data) {
+      console.log(data)
+    }
+  }, [data])
 
   useEffect(() => {
     if (!wsClient || !isConnected || !activeRoom) return
@@ -35,6 +39,10 @@ export default function MessagePanel() {
     )
 
     return () => {
+      wsClient.publish({
+        destination: CHAT_ENDPOINTS.unsubcribeBuilder(activeRoom.id),
+        body: "U",
+      })
       subscription.unsubscribe()
     }
   }, [wsClient, activeRoom, isConnected])
