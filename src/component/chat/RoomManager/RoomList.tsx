@@ -2,13 +2,14 @@ import { useQuery } from "@tanstack/react-query"
 import { QueryRoomKey } from "../../../model/enum/QueryRoomKey"
 import { ChatRoomAPI } from "../../../api/ChatRoomAPI"
 import { Listbox, ListboxItem, Selection } from "@heroui/react"
-import { useContext, useState } from "react"
+import { useContext, useState, useEffect } from "react"
 import { ChatContext } from "../context/chatContext"
 import { HiUserGroup } from "react-icons/hi"
-import { useNavigate } from "@tanstack/react-router"
+import { useNavigate, useParams } from "@tanstack/react-router"
 import { AppRoute } from "../../../model/enum/AppRoutes"
 
 export default function RoomList() {
+  const { id } = useParams({ strict: false }) as { id?: string }
   const { setActiveRoom } = useContext(ChatContext)
   const navigate = useNavigate()
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]))
@@ -21,9 +22,20 @@ export default function RoomList() {
     queryKey: [QueryRoomKey.ROOM_LIST],
     queryFn: ChatRoomAPI.getChatRoomList,
   })
+  useEffect(() => {
+    console.log("Id: ",id);
+    if (roomList) {
+      if (!id) return
+      const room = roomList.find((r) => r.id == parseInt(id))
+      if (room) {
+        setActiveRoom(room)
+      }
+    }
+  }, [roomList, id, setActiveRoom])
 
   if (isLoading) return <p>Loading...</p>
   if (error) return <p>Error loading rooms: {error.message}</p>
+
   return (
     <div>
       <Listbox

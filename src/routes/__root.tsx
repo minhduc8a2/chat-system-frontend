@@ -49,7 +49,7 @@ const chatRoute = createRoute({
   component: Chat,
 })
 
-const chatRoomRoute = createRoute({
+export const chatRoomRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: AppRoute.CHAT+"/$id",
   component: Chat,

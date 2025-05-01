@@ -9,6 +9,7 @@ import RoomMemberList from "./roomMemberList/RoomMemberList"
 import CommandHandler from "./CommandHandler"
 
 export default function Chat() {
+  
   const [activeRoom, setActiveRoom] = useState<Room | null>(null)
 
   const chatContextValue = useMemo<ChatContextType>(

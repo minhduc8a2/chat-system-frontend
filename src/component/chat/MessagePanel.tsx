@@ -1,32 +1,86 @@
 import { useEffect, useRef, useState } from "react"
 import { useVirtualizer } from "@tanstack/react-virtual"
-
 import { CHAT_ENDPOINTS } from "../../api/apiEndpoints"
 import { useWebsocketContext } from "./context/websocketContext"
 import { useChatRoomContext } from "./context/chatContext"
-import { MessageDTO } from "../../model/domain/MessageDTO"
 import { Card, CardBody } from "@heroui/react"
 import { useAuth } from "../../hook/useAuth"
 import { MessageAPI } from "../../api/MessageAPI"
-import { useQuery } from "@tanstack/react-query"
+import { MessageDTO } from "../../model/domain/MessageDTO"
+import { InfiniteScrollResult } from "../../model/domain/InfiniteScrollResult"
 
 export default function MessagePanel() {
   const { authInfo } = useAuth()
   const { wsClient, isConnected } = useWebsocketContext()
   const { activeRoom } = useChatRoomContext()
-  const [messageList, setMessageList] = useState<MessageDTO[]>([])
 
-  const { data } = useQuery({
-    queryFn: () => MessageAPI.getMessagesByLastSeen(activeRoom!.id),
-    queryKey: [],
+  const [infiniteScrollState, setInfiniteScrollState] = useState<
+    InfiniteScrollResult<MessageDTO>
+  >({
+    hasMoreOnTop: false,
+    hasMoreOnBottom: false,
+    data: [],
   })
 
-  useEffect(() => {
-    if (data) {
-      console.log(data)
-    }
-  }, [data])
+  const [isFetchingTop, setIsFetchingTop] = useState(false)
+  const [isFetchingBottom, setIsFetchingBottom] = useState(false)
 
+  const loadingRef = useRef(false)
+  const parentRef = useRef<HTMLDivElement>(null)
+
+  const scrollLockRef = useRef<boolean>(false)
+  const pendingScrollIndexRef = useRef<number | null>(null)
+
+  // Function to update the state with new messages
+  const updateData = (
+    newState: InfiniteScrollResult<MessageDTO>,
+    isTop: boolean = false
+  ) => {
+    setInfiniteScrollState((prev) => ({
+      hasMoreOnTop: newState.hasMoreOnTop,
+      hasMoreOnBottom: newState.hasMoreOnBottom,
+      data: isTop
+        ? [...newState.data, ...prev.data]
+        : [...prev.data, ...newState.data],
+    }))
+  }
+
+  // Initial message load
+  useEffect(() => {
+    if (!activeRoom) return
+
+    setInfiniteScrollState({
+      hasMoreOnBottom: false,
+      hasMoreOnTop: false,
+      data: [],
+    })
+
+    const loadInitial = async () => {
+      loadingRef.current = true
+      scrollLockRef.current = true // 🔐 Lock scroll
+
+      const result = await MessageAPI.getMessagesByLastSeen(activeRoom.id)
+
+      if (result.data.length === 0 && result.hasMoreOnTop) {
+        const older = await MessageAPI.getMessagesByLastMessageId(
+          activeRoom.id,
+          null,
+          "top"
+        )
+        updateData(older, true)
+        pendingScrollIndexRef.current = older.data.length - 1 // scroll to bottom
+      } else {
+        updateData(result)
+        pendingScrollIndexRef.current = 0
+      }
+
+      loadingRef.current = false
+    }
+
+    loadInitial()
+  }, [activeRoom])
+
+  // WebSocket listener for real-time messages
   useEffect(() => {
     if (!wsClient || !isConnected || !activeRoom) return
 
@@ -34,7 +88,14 @@ export default function MessagePanel() {
       CHAT_ENDPOINTS.receiveFromChatRoom + `/${activeRoom.id}`,
       (message) => {
         const parsedMessage = JSON.parse(message.body)
-        setMessageList((prev) => [...prev, MessageDTO.fromJSON(parsedMessage)])
+        setInfiniteScrollState((prev) => {
+          scrollLockRef.current = true
+          pendingScrollIndexRef.current = prev.data.length
+          return {
+            ...prev,
+            data: [...prev.data, parsedMessage],
+          }
+        })
       }
     )
 
@@ -47,18 +108,105 @@ export default function MessagePanel() {
     }
   }, [wsClient, activeRoom, isConnected])
 
-  const parentRef = useRef<HTMLDivElement>(null)
-
+  // Virtualizer setup
   const virtualizer = useVirtualizer({
-    count: messageList.length,
+    count: infiniteScrollState.data.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 60, // reasonable default
-    getItemKey: (index) =>
-      messageList[index].timestamp + "_" + messageList[index].senderId,
+    estimateSize: () => 60,
+    getItemKey: (index) => infiniteScrollState.data[index].id,
     measureElement: (el) => el.getBoundingClientRect().height,
   })
 
   const virtualItems = virtualizer.getVirtualItems()
+
+  const timeOutRef = useRef<number | null>(0)
+  useEffect(() => {
+    timeOutRef.current = setTimeout(() => {
+      const [firstItem] = virtualItems
+      const [lastItem] = [...virtualItems].reverse()
+
+      const fetchMoreOnTop = async () => {
+        if (!activeRoom || isFetchingTop) return
+        setIsFetchingTop(true)
+
+        scrollLockRef.current = true
+
+        const firstMessage = infiniteScrollState.data[0]
+        try {
+          const result = await MessageAPI.getMessagesByLastMessageId(
+            activeRoom.id,
+            firstMessage.id,
+            "top"
+          )
+          updateData(result, true)
+          pendingScrollIndexRef.current = result.data.length
+        } finally {
+          setIsFetchingTop(false)
+        }
+      }
+
+      const fetchMoreOnBottom = async () => {
+        if (!activeRoom || isFetchingBottom) return
+        setIsFetchingBottom(true)
+        const lastMessage =
+          infiniteScrollState.data[infiniteScrollState.data.length - 1]
+
+        scrollLockRef.current = true
+        pendingScrollIndexRef.current = infiniteScrollState.data.length
+        try {
+          const result = await MessageAPI.getMessagesByLastMessageId(
+            activeRoom.id,
+            lastMessage.id,
+            "bottom"
+          )
+          updateData(result, false)
+        } finally {
+          setIsFetchingBottom(false)
+        }
+      }
+
+      if (
+        firstItem?.index <= 2 &&
+        infiniteScrollState.hasMoreOnTop &&
+        !isFetchingTop
+      ) {
+        fetchMoreOnTop()
+      }
+
+      if (
+        lastItem?.index === infiniteScrollState.data.length - 1 &&
+        infiniteScrollState.hasMoreOnBottom &&
+        !isFetchingBottom
+      ) {
+        fetchMoreOnBottom()
+      }
+    }, 500)
+
+    return () => {
+      if (timeOutRef.current) clearTimeout(timeOutRef.current)
+    }
+  }, [
+    virtualItems,
+    infiniteScrollState,
+    isFetchingTop,
+    isFetchingBottom,
+    activeRoom,
+  ])
+
+  useEffect(() => {
+    if (
+      scrollLockRef.current &&
+      pendingScrollIndexRef.current !== null &&
+      virtualizer.getVirtualItems().length > 0
+    ) {
+      console.log("Scroll to index: ", pendingScrollIndexRef.current)
+      virtualizer.scrollToIndex(pendingScrollIndexRef.current, {
+        align: "start",
+      })
+      pendingScrollIndexRef.current = null
+      scrollLockRef.current = false // 🔓 Release the lock
+    }
+  }, [virtualItems, virtualizer])
 
   return (
     <div className="h-96 overflow-y-auto overflow-x-hidden" ref={parentRef}>
@@ -70,7 +218,7 @@ export default function MessagePanel() {
         }}
       >
         {virtualItems.map((virtualItem) => {
-          const msg = messageList[virtualItem.index]
+          const msg = infiniteScrollState.data[virtualItem.index]
           return (
             <div
               key={virtualItem.key}
@@ -85,9 +233,9 @@ export default function MessagePanel() {
                 transform: `translateY(${virtualItem.start}px)`,
               }}
               data-index={virtualItem.index}
-              className={`px-4 py-2 m-2  whitespace-pre-wrap break-words  flex ${
+              className={`px-4 py-2 m-2 whitespace-pre-wrap break-words flex ${
                 msg.senderId === authInfo?.userId
-                  ? "justify-end "
+                  ? "justify-end"
                   : "justify-start"
               }`}
             >

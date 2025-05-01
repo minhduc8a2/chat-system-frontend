@@ -1,4 +1,5 @@
 import { InfiniteScrollResult } from "../model/domain/InfiniteScrollResult"
+import { MessageDTO } from "../model/domain/MessageDTO"
 import api from "../util/requester"
 import { API_GATEWAY_URL } from "./apiEndpoints"
 
@@ -11,19 +12,19 @@ export const USER_PROFILE_ENDPOINTS = {
 export class MessageAPI {
   static async getMessagesByLastMessageId(
     chatRoomId: number,
-    messageId: number,
+    messageId: number | null,
     type: "top" | "bottom"
-  ): Promise<InfiniteScrollResult> {
+  ): Promise<InfiniteScrollResult<MessageDTO>> {
     const res = await api.get(
       USER_PROFILE_ENDPOINTS.getMessagesByLastMessageId +
-        `?chatRoomId=${chatRoomId}&messageId=${messageId}&type=${type}`
+        `?chatRoomId=${chatRoomId}${messageId ? "&messageId=" + messageId : ""}&type=${type}`
     )
     return res.data
   }
 
   static async getMessagesByLastSeen(
     chatRoomId: number
-  ): Promise<InfiniteScrollResult> {
+  ): Promise<InfiniteScrollResult<MessageDTO>> {
     const res = await api.get(
       USER_PROFILE_ENDPOINTS.getMessagesByLastSeen + `?chatRoomId=${chatRoomId}`
     )

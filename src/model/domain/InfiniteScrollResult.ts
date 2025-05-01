@@ -1,6 +1,7 @@
-import { MessageDTO } from "./MessageDTO"
 
-export interface InfiniteScrollResult {
-  hasMore: boolean
-  messages: MessageDTO[]
+export interface InfiniteScrollResult<T> {
+  hasMoreOnTop: boolean
+  hasMoreOnBottom: boolean
+  data: T[]
 }
+
