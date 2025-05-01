@@ -7,12 +7,14 @@ import { useWebsocketContext } from "../context/websocketContext"
 import { CHAT_ENDPOINTS } from "../../../api/apiEndpoints"
 import { updateMemberStatus } from "../../../store/slice/roomMemberListSlice"
 import { UserPresenceDTO } from "../../../model/domain/UserPresenceDTO"
+import { useAuth } from "../../../hook/useAuth"
 
 export default function RoomMember({ member }: { member: BasicUserInfoDTO }) {
   const dispatch = useDispatch()
   const { wsClient, isConnected } = useWebsocketContext()
+  const { authInfo } = useAuth()
   useEffect(() => {
-    if (wsClient && isConnected) {
+    if (wsClient && isConnected && authInfo?.userId != member.id) {
       wsClient.subscribe(
         CHAT_ENDPOINTS.publicPresence + `/${member.id}`,
         (message) => {
@@ -30,17 +32,21 @@ export default function RoomMember({ member }: { member: BasicUserInfoDTO }) {
 
     return () => {
       try {
-        wsClient?.unsubscribe(CHAT_ENDPOINTS.publicPresence)
+        if (authInfo?.userId != member.id) {
+          wsClient?.unsubscribe(CHAT_ENDPOINTS.publicPresence)
+        }
       } catch (error) {
         console.log(error)
       }
     }
-  }, [wsClient, isConnected, dispatch, member.id])
+  }, [wsClient, isConnected, dispatch, member.id, authInfo?.userId])
   return (
     <div>
       <div className="flex gap-x-3 items-center">
         <Avatar size="sm" showFallback fallback={<FaUser />} />
-        <h3 className="">{member.username}</h3>
+        <h3 className="">
+          {authInfo?.userId != member.id ? member.username : "You"}
+        </h3>
         <div
           className={`w-2 h-2 rounded-full ${
             member.isOnline ? "bg-green-500" : "bg-slate-500"
