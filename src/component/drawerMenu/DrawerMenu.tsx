@@ -15,8 +15,11 @@ import UserCard from "./UserCard"
 import { DrawerMenuContext, DrawerMenuContextType } from "./DrawerMenuContext"
 import LinkList from "./LinkList"
 import { useAuth } from "../../hook/useAuth"
+import { useNavigate } from "@tanstack/react-router"
+import { AppRoute } from "../../model/enum/AppRoutes"
 export default function DrawerMenu() {
   const { logout, isAuthenticated } = useAuth()
+  const navigate = useNavigate()
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
   const contextValue = useMemo<DrawerMenuContextType>(
     () => ({ close: onClose }),
@@ -42,7 +45,10 @@ export default function DrawerMenu() {
             </div>
           </DrawerBody>
           <DrawerFooter>
-            <Button isIconOnly onPress={logout}>
+            <Button isIconOnly onPress={()=>{
+              logout()
+              navigate({to:AppRoute.LOGIN.toString()})
+            }}>
               <MdLogout />
             </Button>
           </DrawerFooter>

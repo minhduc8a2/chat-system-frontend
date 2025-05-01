@@ -9,7 +9,6 @@ const initialState: AuthState = {
   isAuthenticated: false,
 }
 
-
 export const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -17,14 +16,15 @@ export const authSlice = createSlice({
     login: (state, action: PayloadAction<AuthResponse>) => {
       const { accessToken, refreshToken } = action.payload
       state.authInfo = JwtUtils.extractUserFromToken(accessToken)
+      state.isAuthenticated = true
       TokenStore.storeTokens(accessToken, refreshToken)
     },
-    logout: () => {
+    logout: (state) => {
+      state.authInfo = null
+      state.isAuthenticated = false
       TokenStore.removeTokens()
     },
   },
-
-  
 })
 
 export const { login, logout } = authSlice.actions
