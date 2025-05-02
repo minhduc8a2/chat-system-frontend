@@ -23,7 +23,7 @@ export default function RoomList() {
     queryFn: ChatRoomAPI.getChatRoomList,
   })
   useEffect(() => {
-    console.log("Id: ",id);
+    console.log("Id: ", id)
     if (roomList) {
       if (!id) return
       const room = roomList.find((r) => r.id == parseInt(id))
@@ -44,10 +44,12 @@ export default function RoomList() {
         selectedKeys={selectedKeys}
         onSelectionChange={(keys) => {
           setSelectedKeys(keys)
-          const id = parseInt(Array.from(keys)[0].toString())
-          setActiveRoom(roomList!.find((r) => r.id == id)!)
-          console.log("active room id: " + id)
-          navigate({ to: AppRoute.CHAT + `/${id}` })
+          if (Array.from(keys).length) {
+            const id = parseInt(Array.from(keys)[0].toString())
+            setActiveRoom(roomList!.find((r) => r.id == id)!)
+            console.log("active room id: " + id)
+            navigate({ to: AppRoute.CHAT + `/${id}` })
+          }
         }}
         selectionMode="single"
         isVirtualized
